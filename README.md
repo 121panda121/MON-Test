@@ -37,57 +37,69 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 ```
 2. 小幽灵钱包脚本  
 ```bash
-   // 自动点击 "Claim MON" 并根据条件刷新或暂停的脚本
-function autoClickAndRefresh() {
-    // 查找 "Claim MON" 按钮
-    const buttons = document.getElementsByTagName('button');
-    let targetButton = null;
-    
-    for (let btn of buttons) {
-        if (btn.textContent.trim().toLowerCase() === 'claim mon') {
-            targetButton = btn;
-            break;
-        }
-    }
-    
-    if (targetButton) {
-        console.log('找到 "Claim MON" 按钮，开始自动点击');
-        let clickInterval = setInterval(() => {
-            targetButton.click();
-            console.log('按钮已点击');
-            
-            // 检查页面是否出现 "Unable to claim at this time"
-            if (document.body.textContent.includes('Unable to claim at this time')) {
-                console.log('检测到 "Unable to claim at this time"，停止点击，等待 5 分钟...');
-                clearInterval(clickInterval); // 停止点击
-                setTimeout(() => {
-                    console.log('5 分钟等待结束，刷新页面并重启脚本');
-                    location.reload(); // 5 分钟后刷新页面
-                }, 300000); // 300000 毫秒 = 5 分钟
+   // 自动点击脚本，不刷新页面
+function autoClick() {
+    // 查找 "Claim MON" 和 "Close" 按钮
+    function findButtons() {
+        const buttons = document.getElementsByTagName('button');
+        let claimButton = null;
+        let closeButton = null;
+
+        for (let btn of buttons) {
+            const text = btn.textContent.trim().toLowerCase();
+            if (text === 'claim mon') {
+                claimButton = btn;
+            } else if (text === 'close') {
+                closeButton = btn;
             }
-        }, 1000); // 每 1 秒点击一次
-        
-        // 正常情况下，每 30 秒刷新一次
-        setTimeout(() => {
-            console.log('30 秒已到，刷新页面...');
-            clearInterval(clickInterval); // 停止当前点击循环
-            location.reload(); // 刷新页面
-        }, 30000); // 30000 毫秒 = 30 秒
-    } else {
-        console.log('未找到 "Claim MON" 按钮，可能是页面未加载完成，等待后重试...');
-        setTimeout(autoClickAndRefresh, 2000); // 等待 2 秒后重试
+            if (claimButton && closeButton) break; // 找到两个按钮后退出循环
+        }
+        return { claimButton, closeButton };
     }
+
+    // 主循环逻辑
+    function startClicking() {
+        let clickInterval = setInterval(() => {
+            const { claimButton, closeButton } = findButtons();
+
+            if (!claimButton) {
+                console.log('未找到 "Claim MON" 按钮，等待 2 秒后重试...');
+                clearInterval(clickInterval);
+                setTimeout(startClicking, 5000); // 2 秒后重试
+                return;
+            }
+
+            if (closeButton) {
+                console.log('找到 "Close" 按钮，点击关闭...');
+                closeButton.click();
+            } else {
+                console.log('未找到 "Close" 按钮，继续点击 "Claim MON"...');
+                claimButton.click();
+            }
+        }, 10000); // 每 1 秒检查并点击一次
+    }
+
+    console.log('启动脚本');
+    startClicking();
 }
 
-// 页面加载完成后启动脚本
+// 页面加载时启动脚本
 window.addEventListener('load', () => {
     console.log('页面加载完成，启动脚本');
-    autoClickAndRefresh();
+    autoClick();
 });
 
-// 初始运行（如果页面已经加载）
+// 初始运行（如果页面已加载）
 if (document.readyState === 'complete') {
-    autoClickAndRefresh();
+    console.log('页面已加载，立即启动脚本');
+    autoClick();
 }
+
+// 监听 DOM 变化，确保动态加载的按钮也能被检测
+const observer = new MutationObserver(() => {
+    console.log('检测到 DOM 变化，检查并启动脚本');
+    autoClick();
+});
+observer.observe(document.body, { childList: true, subtree: true });
 ```
                                                                                                 @Twitter：longyueting
