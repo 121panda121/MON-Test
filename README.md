@@ -1,4 +1,4 @@
-1. 官方网站脚本
+1. 官方网站脚本  
 ```bash
 function autoClickButton() {
     // 查找包含 "get testnet mon" 文本的按钮
@@ -28,8 +28,8 @@ function autoClickButton() {
 // 执行脚本
 autoClickButton();
 ```
-2. 小幽灵钱包脚本
-   ```bash
+2. 小幽灵钱包脚本  
+```bash
    // 自动点击 "Claim MON" 并根据条件刷新或暂停的脚本
 function autoClickAndRefresh() {
     // 查找 "Claim MON" 按钮
