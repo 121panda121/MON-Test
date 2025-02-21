@@ -90,3 +90,4 @@ if (document.readyState === 'complete') {
     autoClickAndRefresh();
 }
 ```
+                                                                                                @Twitter：longyueting
