@@ -1,32 +1,39 @@
 1. 官方网站脚本  
 ```bash
 function autoClickButton() {
-    // 查找包含 "get testnet mon" 文本的按钮
-    // 注意：这里假设按钮文本是 "Get Testnet MON"，大小写敏感
+    // 查找包含 "get testnet mon" 文本的按钮（不区分大小写）
     const buttons = document.getElementsByTagName('button');
     let targetButton = null;
-    
-    // 遍历所有按钮，找到目标按钮
+
     for (let btn of buttons) {
         if (btn.textContent.trim().toLowerCase() === 'get testnet mon') {
             targetButton = btn;
             break;
         }
     }
-    
+
     if (targetButton) {
-        // 每隔 1 秒点击一次按钮
+        console.log('找到目标按钮，开始自动点击');
+        // 每隔 10 秒点击一次按钮
         setInterval(() => {
-            targetButton.click();
-            console.log('按钮已点击');
-        }, 10000); // 1000毫秒 = 1秒，可根据需要调整间隔
+            if (!targetButton.disabled && document.body.contains(targetButton)) {
+                targetButton.click();
+                console.log('按钮已点击，时间: ' + new Date().toLocaleTimeString());
+            } else {
+                console.log('按钮不可用或已从页面移除');
+            }
+        }, 10000); // 10000 毫秒 = 10 秒
     } else {
         console.log('未找到 "get testnet mon" 按钮');
     }
 }
 
-// 执行脚本
-autoClickButton();
+// 确保 DOM 加载完成后再执行
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    autoClickButton();
+} else {
+    document.addEventListener('DOMContentLoaded', autoClickButton);
+}
 ```
 2. 小幽灵钱包脚本  
 ```bash
